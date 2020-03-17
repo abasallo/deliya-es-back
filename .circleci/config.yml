@@ -11,17 +11,17 @@ jobs:
     steps:
       - checkout
       - node/with-cache:
-        steps:
-          - run: npm install
-          - run: npm run test-reports
-          - store_artifacts:
-              path: test-report.html
-              prefix: tests
-          - store_artifacts:
-              path: coverage
-              prefix: coverage
-          - store_test_results:
-              path: test-report.html
+          steps:
+            - run: npm install
+            - run: npm run test-reports
+            - store_artifacts:
+                path: test-report.html
+                prefix: tests
+            - store_artifacts:
+                path: coverage
+                prefix: coverage
+            - store_test_results:
+                path: test-report.html
 
 workflows:
   install-and-test:
