@@ -47,4 +47,3 @@
     "debug": "nodemon --exec babel-node src/server.js --inspect"
   }
 }
-

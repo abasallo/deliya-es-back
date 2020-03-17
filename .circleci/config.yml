@@ -3,57 +3,33 @@ orbs:
   node: circleci/node@1.1.6
   heroku: circleci/heroku@1.0.1
 jobs:
-  install-and-test-back:
+  install-and-test:
     docker:
       - image: circleci/node:latest
       - image: circleci/postgres:latest
         environment:
           POSTGRES_HOST_AUTH_METHOD: trust
-    working_directory: ~/deliya.es/back  
     steps:
-      - checkout:
-          path: ~/deliya.es
       - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm run test-reports
-            - store_artifacts:
-                path: test-report.html
-                prefix: tests
-            - store_artifacts:
-                path: coverage
-                prefix: coverage
-            - store_test_results:
-                path: test-report.html
-  install-and-test-front:
-    docker:
-      - image: circleci/node:latest-browsers
-    working_directory: ~/deliya.es/front  
-    steps:
-      - checkout:
-          path: ~/deliya.es
-      - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm run test-reports
-            - store_artifacts:
-                path: test-report.html
-                prefix: tests
-            - store_artifacts:
-                path: coverage
-                prefix: coverage
-            - store_test_results:
-                path: test-report.html
+        steps:
+          - run: npm install
+          - run: npm run test-reports
+          - store_artifacts:
+              path: test-report.html
+              prefix: tests
+          - store_artifacts:
+              path: coverage
+              prefix: coverage
+          - store_test_results:
+              path: test-report.html
 
 workflows:
   install-test-and-deploy:
     jobs:
-      - install-and-test-back
-      - install-and-test-front
+      - install-and-test
       - heroku/deploy-via-git:
           requires:
-            - install-and-test-back
-            - install-and-test-front
+            - install-and-test
           filters:
             branches:
               only: master
