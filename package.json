@@ -43,7 +43,9 @@
     "test-reports": "jest --testEnvironment=node --testResultsProcessor=./node_modules/jest-html-reporter --collectCoverage=true",
     "prebuild": "rm -rf ./build/",
     "build": "babel -d ./build/ ./src/",
-    "start": "nodemon --exec babel-node src/server.js",
+    "prestart": "npm run build",
+    "start": "NODE_ENV=production node build/server.js",
+    "nodemon": "nodemon --exec babel-node src/server.js",
     "debug": "nodemon --exec babel-node src/server.js --inspect"
   }
 }
