@@ -13,7 +13,11 @@ import resolvers from './graphql/resolvers'
 
 import { getAuthenticatedUserFromRequest } from './modules/jwt'
 
-// TODO - Too much information on Authentication errors is returned, is OK in DEV, but should be 401 in PROD
-new ApolloServer({ typeDefs, resolvers, context: ({ req }) => ({ authenticatedUserEmail: getAuthenticatedUserFromRequest(req) }) })
-  .listen({ port: process.env.PORT || 4000 })
+new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => ({ authenticatedUserEmail: getAuthenticatedUserFromRequest(req) })
+})
+  .listen({ port: process.env.PORT })
   .then(({ url }) => console.log(`Server ready at ${url}`))
+  .catch(error => console.error(`Server startup error: ${error}`))

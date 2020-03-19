@@ -1,9 +1,19 @@
 import Sequelize from 'sequelize'
 
-const dbDialect = process.env.DB_DIALECT || 'sqlite'
-const dbPath = process.env.DB_PATH || 'deliya.sqlite'
-
-const sequelize = new Sequelize({ dialect: dbDialect, storage: dbPath, pool: { max: 5, min: 0, idle: 10000 } })
+let sequelize
+if (process.env.NODE_ENV === 'production') {
+  sequelize = new Sequelize(process.env.DATABASE_URL)
+} else {
+  sequelize = new Sequelize({
+    dialect: process.env.DATABASE_DIALECT,
+    storage: process.env.DATABASE_PATH,
+    pool: {
+      max: 5,
+      min: 0,
+      idle: 10000
+    }
+  })
+}
 
 export const User = sequelize.define('user', {
   names: { type: Sequelize.STRING },
@@ -18,15 +28,18 @@ const initSequelize = async () => {
     await sequelize.authenticate()
     console.log('Connection has been established successfully.')
     await User.sync({ force: true })
-    User.create({
-      names: 'Álvaro',
-      surnames: 'Basallo Martínez',
-      email: 'alvaro@basallo.es',
-      password: '$2a$10$szbU0ZiERI8wFrbOaaTUnOqzkzKJAA4EJl6qRfGRZ8Moi07zipxTm',
-      isEmailContactAllowed: true
-    })
+    if (process.env.NODE_ENV !== 'production') {
+      User.create({
+        names: 'Álvaro',
+        surnames: 'Basallo Martínez',
+        email: 'alvaro@basallo.es',
+        password: '$2a$10$szbU0ZiERI8wFrbOaaTUnOqzkzKJAA4EJl6qRfGRZ8Moi07zipxTm',
+        isEmailContactAllowed: true
+      })
+    }
   } catch (error) {
-    console.error('Unable to connect to the database:', error)
+    console.error('Unable to connect to database:', error)
   }
 }
-initSequelize()
+
+initSequelize().catch(error => console.error('Unable to initialize database:', error))
