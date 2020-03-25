@@ -7,21 +7,25 @@
   "main": "server.js",
   "dependencies": {
     "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.7",
-    "@babel/node": "^7.8.7",
-    "@babel/polyfill": "^7.8.7",
-    "@babel/preset-env": "^7.8.7",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/runtime": "^7.9.2",
     "apollo-server": "^2.11.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "graphql": "^14.6.0",
     "jsonwebtoken": "^8.5.1",
-    "pg": "^7.18.2",
     "nodemailer": "^6.4.5",
-    "sequelize": "^5.21.5",
-    "sqlite3": "^4.1.1"
+    "pg": "^7.18.2",
+    "sequelize": "^5.21.5"
   },
   "devDependencies": {
+    "@babel/node": "^7.8.7",
+    "@babel/polyfill": "^7.8.7",
+    "apollo-fetch": "^0.7.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^25.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-config-standard": "^14.1.0",
@@ -33,7 +37,9 @@
     "jest": "^25.1.0",
     "jest-html-reporter": "^2.8.1",
     "nodemon": "^2.0.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "request-promise": "^4.2.5",
+    "sqlite3": "^4.1.1"
   },
   "engines": {
     "node": "12.x"

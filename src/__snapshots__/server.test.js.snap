@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Add user 1`] = `
+Object {
+  "data": Object {
+    "addUser": Object {
+      "email": "email",
+      "id": "2",
+      "isEmailContactAllowed": true,
+      "names": "names",
+      "password": Any<String>,
+      "surnames": "surnames",
+    },
+  },
+}
+`;
+
+exports[`Change password with token 1`] = `
+Object {
+  "data": Object {
+    "changePasswordWithToken": true,
+  },
+}
+`;
+
+exports[`Change password with wrong, or expired, token 1`] = `
+Object {
+  "data": Object {
+    "changePasswordWithToken": false,
+  },
+}
+`;
+
+exports[`Login with user and incorrect password 1`] = `
+Object {
+  "data": Object {
+    "login": "",
+  },
+}
+`;
+
+exports[`Login with user and password 1`] = `
+Object {
+  "data": Object {
+    "login": Any<String>,
+  },
+}
+`;
+
+exports[`Request password recovery 1`] = `
+Object {
+  "data": Object {
+    "requestPasswordRecoveryUrlOverEmail": true,
+  },
+}
+`;
+
+exports[`Request password recovery with nonexistent email 1`] = `
+Object {
+  "data": Object {
+    "requestPasswordRecoveryUrlOverEmail": false,
+  },
+}
+`;

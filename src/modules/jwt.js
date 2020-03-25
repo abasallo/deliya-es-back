@@ -1,7 +1,13 @@
 import jwt from 'jsonwebtoken'
 
-const getUserFromToken = token => (token ? jwt.verify(token, process.env.JWT_SECRET).email : '')
+export const getUserFromToken = token => (token ? jwt.verify(token, process.env.JWT_SECRET).email : '')
 
-const getTokenFromRequest = request => (request.headers.authorization || '').split(' ')[1]
+export const getTokenFromRequest = request => {
+  try {
+    return request.headers.authorization || '' ? (request.headers.authorization || '').split(' ')[1] : ''
+  } catch (e) {
+    return ''
+  }
+}
 
 export const getAuthenticatedUserFromRequest = request => getUserFromToken(getTokenFromRequest(request))

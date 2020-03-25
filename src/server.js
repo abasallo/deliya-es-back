@@ -1,9 +1,6 @@
-import 'core-js/stable'
-import 'regenerator-runtime/runtime'
-
 import './modules/dotenv'
 
-import './graphql/sequelize'
+import { initSequelize } from './graphql/sequelize'
 
 import { ApolloServer } from 'apollo-server'
 
@@ -12,6 +9,8 @@ import typeDefs from './graphql/schema'
 import resolvers from './graphql/resolvers'
 
 import { getAuthenticatedUserFromRequest } from './modules/jwt'
+
+initSequelize().catch(error => console.error(`Unable to initialize database: ${error}`))
 
 new ApolloServer({
   typeDefs,

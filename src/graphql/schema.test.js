@@ -1,1 +1,3 @@
-test('Placeholder test', () => expect(true).toBe(true))
+import schema from './schema'
+
+test('Schema must be defined', () => expect(schema).toBeTruthy())

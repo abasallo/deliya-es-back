@@ -1,19 +1,9 @@
 import Sequelize from 'sequelize'
 
-let sequelize
-if (process.env.NODE_ENV === 'production') {
-  sequelize = new Sequelize(process.env.DATABASE_URL)
-} else {
-  sequelize = new Sequelize({
-    dialect: process.env.DATABASE_DIALECT,
-    storage: process.env.DATABASE_PATH,
-    pool: {
-      max: 5,
-      min: 0,
-      idle: 10000
-    }
-  })
-}
+export const sequelize =
+  process.env.NODE_ENV === 'production'
+    ? new Sequelize(process.env.DATABASE_URL)
+    : new Sequelize({ dialect: process.env.DATABASE_DIALECT, storage: process.env.DATABASE_PATH, pool: { max: 5, min: 0, idle: 10000 } })
 
 export const User = sequelize.define('user', {
   names: { type: Sequelize.STRING },
@@ -23,23 +13,25 @@ export const User = sequelize.define('user', {
   isEmailContactAllowed: { type: Sequelize.BOOLEAN }
 })
 
-const initSequelize = async () => {
-  try {
-    await sequelize.authenticate()
-    console.log('Connection has been established successfully.')
-    await User.sync({ force: true })
-    if (process.env.NODE_ENV !== 'production') {
-      User.create({
-        names: 'Álvaro',
-        surnames: 'Basallo Martínez',
-        email: 'alvaro@basallo.es',
-        password: '$2a$10$szbU0ZiERI8wFrbOaaTUnOqzkzKJAA4EJl6qRfGRZ8Moi07zipxTm',
-        isEmailContactAllowed: true
-      })
-    }
-  } catch (error) {
-    console.error('Unable to connect to database:', error)
-  }
+export const NonProductionFakeUser = {
+  names: 'Álvaro',
+  surnames: 'Basallo Martínez',
+  email: 'alvaro@basallo.es',
+  password: '$2a$10$szbU0ZiERI8wFrbOaaTUnOqzkzKJAA4EJl6qRfGRZ8Moi07zipxTm',
+  isEmailContactAllowed: true
 }
 
-initSequelize().catch(error => console.error('Unable to initialize database:', error))
+const initNonProductionFakeData = async env => (env !== 'production' ? User.create(NonProductionFakeUser) : undefined)
+
+export const initSequelize = async () => {
+  try {
+    await sequelize.authenticate()
+    await User.sync({ force: true })
+    await initNonProductionFakeData(process.env.NODE_ENV)
+    console.log('Connection has been established successfully.')
+    return true
+  } catch (error) {
+    console.error('Unable to connect to database:', error)
+    return false
+  }
+}

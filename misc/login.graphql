@@ -1,5 +1,0 @@
-# .graphqlconfig=/home/alvaro/Projects/deliya.es/back!
-
-query($email: String, $password: String) {
-    login(email: $email, password: $password)
-}

@@ -1,58 +1,73 @@
-import { AuthenticationError } from 'apollo-server'
-
 import { User } from './sequelize'
 
 import bcrypt from 'bcryptjs'
 
 import jwt from 'jsonwebtoken'
 
+import { getUserFromToken } from '../modules/jwt'
+
 import { sendEmail } from '../modules/email'
 
-export default {
-  Query: {
-    login: async (parent, { email, password }) => {
-      try {
-        const user = await User.findOne({ where: { email: email } })
-        return (await bcrypt.compare(password, user.password))
-          ? jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' })
-          : ''
-      } catch (error) {
-        return ''
-      }
-    },
-    requestPasswordRecoveryUrlOverEmail: async (parent, { email }) => {
-      try {
-        return (await User.findOne({ where: { email: email } }))
-          ? sendEmail(email, await jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' }))
-          : false
-      } catch (error) {
-        return false
+export const login = async (parent, { email, password }) => {
+  try {
+    const user = await User.findOne({ where: { email: email } })
+    if (user) {
+      const passwordChecks = await bcrypt.compare(password, user.password)
+      if (passwordChecks) {
+        return jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' })
       }
     }
-  },
-  Mutation: {
-    addUser: async (parent, { user }) => {
-      const alreadyExistentUser = await User.findOne({ where: { email: user.email } })
-      if (alreadyExistentUser) throw new AuthenticationError() // TODO - Add specific, duplicated email error (unique field)
-      try {
-        return User.create({
-          names: user.names,
-          surnames: user.surnames,
-          email: user.email,
-          password: await bcrypt.hash(user.password, 10),
-          isEmailContactAllowed: user.isEmailContactAllowed
-        })
-      } catch (error) {
-        return undefined
-      }
-    },
-    changePasswordWithToken: async (parent, { password, token }) => {
-      try {
-        User.update({ password: await bcrypt.hash(password, 10) }, { where: { email: jwt.verify(token, process.env.JWT_SECRET).email } })
-        return true
-      } catch (error) {
-        return false
-      }
-    }
+    return Promise.resolve('')
+  } catch (error) {
+    return Promise.resolve('')
   }
+}
+
+export const requestPasswordRecoveryUrlOverEmail = async (parent, { email }) => {
+  try {
+    const user = await User.findOne({ where: { email: email } })
+    if (user) {
+      const token = await jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+      await sendEmail(email, token)
+      return Promise.resolve(true)
+    }
+    return Promise.resolve(false)
+  } catch (error) {
+    return Promise.resolve(false)
+  }
+}
+
+export const addUser = async (parent, { user }) => {
+  try {
+    const dbUser = await User.findOne({ where: { email: user.email } })
+    if (!dbUser) {
+      return User.create({
+        names: user.names,
+        surnames: user.surnames,
+        email: user.email,
+        password: await bcrypt.hash(user.password, 10),
+        isEmailContactAllowed: user.isEmailContactAllowed
+      })
+    }
+  } catch (error) {
+    return Promise.resolve(false)
+  }
+}
+
+export const changePasswordWithToken = async (parent, { password, token }) => {
+  try {
+    if (await jwt.verify(token, process.env.JWT_SECRET)) {
+      await User.update({ password: await bcrypt.hash(password, 10) }, { where: { email: await getUserFromToken(token) } })
+      return Promise.resolve(true)
+    } else {
+      return Promise.resolve(false)
+    }
+  } catch (error) {
+    return Promise.resolve(false)
+  }
+}
+
+export default {
+  Query: { login: login, requestPasswordRecoveryUrlOverEmail: requestPasswordRecoveryUrlOverEmail },
+  Mutation: { addUser: addUser, changePasswordWithToken: changePasswordWithToken }
 }

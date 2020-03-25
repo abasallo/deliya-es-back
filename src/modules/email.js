@@ -13,10 +13,5 @@ export const sendEmail = async (email, token) => {
   const EMAIL_TEXT = `Por favor, visite el siguiente enlace: http://localhost:3000/password-change/${token}`
   const EMAIL_HTML = `<b>Por favor, visite el siguiente <a href="http://localhost:3000/password-change/${token}">enlace.</a></b>`
 
-  try {
-    await nodemailerTransporter.sendMail({ from: EMAIL_FROM, to: email, subject: EMAIL_SUBJECT, text: EMAIL_TEXT, html: EMAIL_HTML })
-    return true
-  } catch (error) {
-    return false
-  }
+  return nodemailerTransporter.sendMail({ from: EMAIL_FROM, to: email, subject: EMAIL_SUBJECT, text: EMAIL_TEXT, html: EMAIL_HTML })
 }
