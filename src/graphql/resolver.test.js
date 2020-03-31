@@ -12,14 +12,18 @@ jest.mock('../modules/email', () => ({ sendEmail: () => true }))
 
 beforeAll(() => initSequelize())
 
-test('Logs user with email and password', () => {
-  expect(login({}, { email: 'alvaro@basallo.es', password: 'ojete' })).resolves.toBeTruthy()
-  expect(login({}, { email: 'alvaro@basallo.es', password: 'cancamusa' })).resolves.toBe('')
+test('Logs user with email and password', async () => {
+  const loginOK = await login({}, { email: 'alvaro@basallo.es', password: 'ojete' })
+  expect(loginOK).toBeTruthy()
+  const loginKO = await login({}, { email: 'alvaro@basallo.es', password: 'cancamusa' })
+  expect(loginKO).toBe('')
 })
 
-test('Request password recovery', () => {
-  expect(requestPasswordRecoveryUrlOverEmail({}, { email: 'alvaro@basallo.es' })).resolves.toBeTruthy()
-  expect(requestPasswordRecoveryUrlOverEmail({}, { email: 'inexistent@email.es' })).resolves.toBe(false)
+test('Request password recovery', async () => {
+  const passwordRecoveryRequestOK = await requestPasswordRecoveryUrlOverEmail({}, { email: 'alvaro@basallo.es' })
+  expect(passwordRecoveryRequestOK).toBeTruthy()
+  const passwordRecoveryRequestKO = await requestPasswordRecoveryUrlOverEmail({}, { email: 'inexistent@email.es' })
+  expect(passwordRecoveryRequestKO).toBeFalsy()
 })
 
 test('Adds user, if not already exists', async () => {
@@ -53,7 +57,8 @@ test('Adds user, if not already exists', async () => {
 
 test('Change password with token', async () => {
   const token = await jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, JWT_SECRET, { expiresIn: '10m' })
-  await changePasswordWithToken({}, { password: 'changedPassword', token: token })
+  const passwordChanged = await changePasswordWithToken({}, { password: 'changedPassword', token: token })
+  expect(passwordChanged).toBeTruthy()
   const result = await login({}, { email: 'alvaro@basallo.es', password: 'changedPassword' })
   expect(result).toBeTruthy()
 })
