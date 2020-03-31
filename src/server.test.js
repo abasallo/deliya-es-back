@@ -8,8 +8,6 @@ const fetch = createApolloFetch({ uri: 'http://localhost:4000/graphql' })
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-jest.setTimeout(30000)
-
 test('Login with user and password', async () =>
   expect(
     fetch({

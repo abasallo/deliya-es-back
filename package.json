@@ -45,7 +45,7 @@
   },
   "scripts": {
     "lint": "eslint --fix ./src",
-    "test": "jest --testEnvironment=node",
+    "test": "jest --testEnvironment=node --runInBand --forceExit",
     "dev": "nodemon --exec babel-node src/server.js --source-maps ",
     "debug": "nodemon --exec babel-node src/server.js --inspect --source-maps",
     "prebuild": "rm -rf ./build/",

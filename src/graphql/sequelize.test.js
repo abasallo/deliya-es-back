@@ -4,7 +4,7 @@ import { sequelize, User, NonProductionFakeUser, initSequelize } from './sequeli
 
 test('Sequelize object must be initalized', () => expect(sequelize).toBeTruthy())
 
-test('User object must be initalized', () => expect(User).toBeTruthy())
+test('User object must be initialized', () => expect(User).toBeTruthy())
 
 test('Development database must be properly initialized', async () => {
   expect(await initSequelize()).toBeTruthy()
