@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 jest.mock('../modules/email', () => ({ sendEmail: () => true }))
 
-beforeAll(() => initSequelize())
+beforeAll(async () => await initSequelize())
 
 test('Logs user with email and password', async () => {
   const loginOK = await login({}, { email: 'alvaro@basallo.es', password: 'ojete' })

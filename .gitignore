@@ -5,4 +5,4 @@ coverage/
 
 .env
 *.sqlite*
-test-report.html
+junit.xml
