@@ -1,61 +1,59 @@
-import jwt from 'jsonwebtoken'
+import 'dotenv/config'
 
-import '../modules/dotenv'
+import jwt from 'jsonwebtoken'
 
 import { login, requestPasswordRecoveryUrlOverEmail, addUser, changePasswordWithToken } from './resolvers'
 
 import { initSequelize } from './sequelize'
 
+const JWT_SECRET = process.env.JWT_SECRET
+
 jest.mock('../modules/email', () => ({ sendEmail: () => true }))
 
 beforeAll(() => initSequelize())
 
-test('Logs user with email and password', async () => {
-  expect(login({}, { email: 'alvaro@basallo.es', password: 'ojete' })).toBeTruthy()
-  expect(login({}, { email: 'alvaro@basallo.es', password: 'cancamusa' })).resolves.toBe({})
+test('Logs user with email and password', () => {
+  expect(login({}, { email: 'alvaro@basallo.es', password: 'ojete' })).resolves.toBeTruthy()
+  expect(login({}, { email: 'alvaro@basallo.es', password: 'cancamusa' })).resolves.toBe('')
 })
 
-test('Request password recovery', async () => {
-  expect(requestPasswordRecoveryUrlOverEmail({}, { email: 'alvaro@basallo.es' })).toBeTruthy()
-  expect(requestPasswordRecoveryUrlOverEmail({}, { email: 'inexistent@email.es' })).resolves.toBe({})
+test('Request password recovery', () => {
+  expect(requestPasswordRecoveryUrlOverEmail({}, { email: 'alvaro@basallo.es' })).resolves.toBeTruthy()
+  expect(requestPasswordRecoveryUrlOverEmail({}, { email: 'inexistent@email.es' })).resolves.toBe(false)
 })
 
 test('Adds user, if not already exists', async () => {
-  expect(
-    addUser(
-      {},
-      {
+  const firstAddUserAttempt = await addUser(
+    {},
+    {
+      user: {
         names: 'names',
         surnames: 'surnames',
         email: 'email',
         password: 'password',
         isEmailContactAllowed: true
       }
-    )
-  ).toBeTruthy()
-  expect(
-    addUser(
-      {},
-      {
+    }
+  )
+  expect(firstAddUserAttempt).toBeTruthy()
+  const secondAddUserAttempt = await addUser(
+    {},
+    {
+      user: {
         names: 'names',
         surnames: 'surnames',
-        email: 'alvaro@basallo.es',
+        email: 'email',
         password: 'password',
         isEmailContactAllowed: true
       }
-    )
-  ).resolves.toBe({})
+    }
+  )
+  expect(secondAddUserAttempt).toBe(undefined)
 })
 
 test('Change password with token', async () => {
-  expect(
-    changePasswordWithToken(
-      {},
-      {
-        password: 'changedPassword',
-        token: jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
-      }
-    )
-  ).toBeTruthy()
-  expect(login({}, { email: 'alvaro@basallo.es', password: 'changedPassword' }))
+  const token = await jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, JWT_SECRET, { expiresIn: '10m' })
+  await changePasswordWithToken({}, { password: 'changedPassword', token: token })
+  const result = await login({}, { email: 'alvaro@basallo.es', password: 'changedPassword' })
+  expect(result).toBeTruthy()
 })

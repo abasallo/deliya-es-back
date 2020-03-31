@@ -1,9 +1,16 @@
 import Sequelize from 'sequelize'
 
+const NODE_ENV = process.env.NODE_ENV
+const NODE_ENV_PRODUCTION_STRING = 'production'
+
+const DATABASE_URL = process.env.DATABASE_URL
+const DATABASE_DIALECT = process.env.DATABASE_DIALECT
+const DATABASE_PATH = process.env.DATABASE_PATH
+
 export const sequelize =
-  process.env.NODE_ENV === 'production'
-    ? new Sequelize(process.env.DATABASE_URL)
-    : new Sequelize({ dialect: process.env.DATABASE_DIALECT, storage: process.env.DATABASE_PATH, pool: { max: 5, min: 0, idle: 10000 } })
+  NODE_ENV === 'production'
+    ? new Sequelize(DATABASE_URL)
+    : new Sequelize({ dialect: DATABASE_DIALECT, storage: DATABASE_PATH, pool: { max: 5, min: 0, idle: 10000 } })
 
 export const User = sequelize.define('user', {
   names: { type: Sequelize.STRING },
@@ -21,13 +28,13 @@ export const NonProductionFakeUser = {
   isEmailContactAllowed: true
 }
 
-const initNonProductionFakeData = async env => (env !== 'production' ? User.create(NonProductionFakeUser) : undefined)
+const initNonProductionFakeData = async env => (env !== NODE_ENV_PRODUCTION_STRING ? User.create(NonProductionFakeUser) : undefined)
 
 export const initSequelize = async () => {
   try {
     await sequelize.authenticate()
     await User.sync({ force: true })
-    await initNonProductionFakeData(process.env.NODE_ENV)
+    await initNonProductionFakeData(NODE_ENV)
     console.log('Connection has been established successfully.')
     return true
   } catch (error) {

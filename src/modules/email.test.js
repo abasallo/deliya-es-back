@@ -1,4 +1,5 @@
-import './dotenv'
+import 'dotenv/config'
+
 import { nodemailerTransporter, sendEmail } from './email'
 
 jest.mock('nodemailer', () => ({ createTransport: _ => _ }))

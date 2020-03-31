@@ -6,9 +6,11 @@ import jwt from 'jsonwebtoken'
 
 const fetch = createApolloFetch({ uri: 'http://localhost:4000/graphql' })
 
+const JWT_SECRET = process.env.JWT_SECRET
+
 jest.setTimeout(30000)
 
-test('Login with user and password', () =>
+test('Login with user and password', async () =>
   expect(
     fetch({
       query: 'query($email: String, $password: String) { login(email: $email, password: $password) }',
@@ -16,7 +18,7 @@ test('Login with user and password', () =>
     })
   ).resolves.toMatchSnapshot({ data: { login: expect.any(String) } }))
 
-test('Login with user and incorrect password', () =>
+test('Login with user and incorrect password', async () =>
   expect(
     fetch({
       query: 'query($email: String, $password: String) { login(email: $email, password: $password) }',
@@ -24,7 +26,7 @@ test('Login with user and incorrect password', () =>
     })
   ).resolves.toMatchSnapshot())
 
-test('Request password recovery', () =>
+test('Request password recovery', async () =>
   expect(
     fetch({
       query: 'query($email: String) { requestPasswordRecoveryUrlOverEmail(email: $email) }',
@@ -32,7 +34,7 @@ test('Request password recovery', () =>
     })
   ).resolves.toMatchSnapshot())
 
-test('Request password recovery with nonexistent email', () =>
+test('Request password recovery with nonexistent email', async () =>
   expect(
     fetch({
       query: 'query($email: String) { requestPasswordRecoveryUrlOverEmail(email: $email) }',
@@ -51,7 +53,7 @@ mutation($names: String, $surnames: String, $email: String!, $password: String!,
     isEmailContactAllowed
   }
 }`
-test('Add user', () =>
+test('Add user', async () =>
   expect(
     fetch({
       query: createUserQuery,
@@ -59,19 +61,18 @@ test('Add user', () =>
     })
   ).resolves.toMatchSnapshot({ data: { addUser: { password: expect.any(String) } } }))
 
-jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
 test('Change password with token', async () =>
   expect(
     fetch({
       query: 'mutation($password: String, $token: String) { changePasswordWithToken(password: $password, token: $token) }',
       variables: {
         password: 'newPassword',
-        token: await jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+        token: await jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, JWT_SECRET, { expiresIn: '10m' })
       }
     })
   ).resolves.toMatchSnapshot())
 
-test('Change password with wrong, or expired, token', () =>
+test('Change password with wrong, or expired, token', async () =>
   expect(
     fetch({
       query: 'mutation($password: String, $token: String) { changePasswordWithToken(password: $password, token: $token) }',

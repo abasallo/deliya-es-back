@@ -1,4 +1,4 @@
-import './modules/dotenv'
+import 'dotenv/config'
 
 import { initSequelize } from './graphql/sequelize'
 
@@ -10,6 +10,8 @@ import resolvers from './graphql/resolvers'
 
 import { getAuthenticatedUserFromRequest } from './modules/jwt'
 
+const PORT = process.env.PORT
+
 initSequelize().catch(error => console.error(`Unable to initialize database: ${error}`))
 
 new ApolloServer({
@@ -17,6 +19,6 @@ new ApolloServer({
   resolvers,
   context: ({ req }) => ({ authenticatedUserEmail: getAuthenticatedUserFromRequest(req) })
 })
-  .listen({ port: process.env.PORT })
+  .listen({ port: PORT })
   .then(({ url }) => console.log(`Server ready at ${url}`))
   .catch(error => console.error(`Server startup error: ${error}`))

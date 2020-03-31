@@ -3,6 +3,6 @@ build/
 node_modules/
 coverage/
 
+.env
 *.sqlite*
-
 test-report.html

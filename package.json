@@ -48,11 +48,10 @@
     "lint": "eslint --fix ./src",
     "test": "jest --testEnvironment=node",
     "test-reports": "jest --testEnvironment=node --testResultsProcessor=./node_modules/jest-html-reporter --collectCoverage=true",
+    "dev": "nodemon --exec babel-node src/server.js --source-maps ",
+    "debug": "nodemon --exec babel-node src/server.js --inspect --source-maps",
     "prebuild": "rm -rf ./build/",
-    "build": "babel -d ./build/ ./src/",
-    "prestart": "npm run build",
-    "start": "NODE_ENV=production node build/server.js",
-    "nodemon": "nodemon --exec babel-node src/server.js",
-    "debug": "nodemon --exec babel-node src/server.js --inspect"
+    "build": "babel ./src --out-dir ./build --source-maps --ignore '**/*.test.js'",
+    "start": "NODE_ENV=production node build/server.js"
   }
 }

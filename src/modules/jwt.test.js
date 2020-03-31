@@ -1,4 +1,5 @@
-import './dotenv'
+import 'dotenv/config'
+
 import { getUserFromToken, getTokenFromRequest, getAuthenticatedUserFromRequest } from './jwt'
 
 jest.mock('jsonwebtoken', () => ({ verify: (token, secret) => ({ email: token, secret: secret }) }))

@@ -8,13 +8,15 @@ import { getUserFromToken } from '../modules/jwt'
 
 import { sendEmail } from '../modules/email'
 
+const JWT_SECRET = process.env.JWT_SECRET
+
 export const login = async (parent, { email, password }) => {
   try {
     const user = await User.findOne({ where: { email: email } })
     if (user) {
       const passwordChecks = await bcrypt.compare(password, user.password)
       if (passwordChecks) {
-        return jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' })
+        return jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '30d' })
       }
     }
     return Promise.resolve('')
@@ -27,7 +29,7 @@ export const requestPasswordRecoveryUrlOverEmail = async (parent, { email }) => 
   try {
     const user = await User.findOne({ where: { email: email } })
     if (user) {
-      const token = await jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+      const token = await jwt.sign({ email: email, date: Date.now() }, JWT_SECRET, { expiresIn: '10m' })
       await sendEmail(email, token)
       return Promise.resolve(true)
     }
@@ -56,7 +58,7 @@ export const addUser = async (parent, { user }) => {
 
 export const changePasswordWithToken = async (parent, { password, token }) => {
   try {
-    if (await jwt.verify(token, process.env.JWT_SECRET)) {
+    if (await jwt.verify(token, JWT_SECRET)) {
       await User.update({ password: await bcrypt.hash(password, 10) }, { where: { email: await getUserFromToken(token) } })
       return Promise.resolve(true)
     } else {
