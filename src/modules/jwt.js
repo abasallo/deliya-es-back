@@ -1,14 +1,19 @@
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET
-
-export const getUserFromToken = token => (token ? jwt.verify(token, JWT_SECRET).email : '')
+export const getUserFromToken = async token => {
+  try {
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET)
+    return decoded.email
+  } catch (error) {
+    return undefined
+  }
+}
 
 export const getTokenFromRequest = request => {
   try {
-    return request.headers.authorization || '' ? (request.headers.authorization || '').split(' ')[1] : ''
-  } catch (e) {
-    return ''
+    return request.headers.authorization.split(' ')[1]
+  } catch (error) {
+    return undefined
   }
 }
 

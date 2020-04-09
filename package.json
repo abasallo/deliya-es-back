@@ -12,6 +12,7 @@
     "@babel/preset-env": "^7.9.0",
     "@babel/runtime": "^7.9.2",
     "apollo-server": "^2.11.0",
+    "apollo-server-errors": "^2.4.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "graphql": "^14.6.0",
@@ -38,16 +39,18 @@
     "nodemon": "^2.0.2",
     "prettier": "^1.19.1",
     "request-promise": "^4.2.5",
-    "sqlite3": "^4.1.1"
+    "sqlite3": "^4.1.1",
+    "supertest": "^4.0.2"
   },
   "engines": {
     "node": "12.x"
   },
   "scripts": {
     "lint": "eslint --fix ./src",
-    "test": "jest --testEnvironment=node --runInBand --forceExit",
-    "dev": "nodemon --exec babel-node src/server.js --source-maps ",
-    "debug": "nodemon --exec babel-node src/server.js --inspect --source-maps",
+    "test": "NODE_ENV=test jest --testPathPattern=/src --testEnvironment=node",
+    "e2e": "NODE_ENV=test jest --testPathPattern=/e2e --testEnvironment=node",
+    "dev": "NODE_ENV=dev nodemon --exec babel-node src/server.js --source-maps ",
+    "debug": "NODE_ENV=dev nodemon --exec babel-node src/server.js --inspect --source-maps",
     "prebuild": "rm -rf ./build/",
     "build": "babel ./src --out-dir ./build --source-maps --ignore '**/*.test.js'",
     "start": "NODE_ENV=production node build/server.js"

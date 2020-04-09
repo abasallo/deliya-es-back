@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Add user 1`] = `
+Object {
+  "data": Object {
+    "addUser": Object {
+      "email": "email",
+      "id": Any<String>,
+      "isEmailContactAllowed": true,
+      "names": "names",
+      "password": Any<String>,
+      "surnames": "surnames",
+    },
+  },
+}
+`;
+
+exports[`Change password with token 1`] = `
+Object {
+  "data": Object {
+    "changePasswordWithToken": true,
+  },
+}
+`;
+
+exports[`Change password with wrong, or expired, token 1`] = `
+Object {
+  "data": Object {
+    "changePasswordWithToken": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "UNAUTHENTICATED",
+      },
+      "locations": Array [
+        Object {
+          "column": 47,
+          "line": 1,
+        },
+      ],
+      "message": "Invalid token",
+      "path": Array [
+        "changePasswordWithToken",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`Login with user and incorrect password 1`] = `
+Object {
+  "data": Object {
+    "login": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "UNAUTHENTICATED",
+      },
+      "locations": Array [
+        Object {
+          "column": 44,
+          "line": 1,
+        },
+      ],
+      "message": "Invalid password",
+      "path": Array [
+        "login",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`Login with user and password 1`] = `
+Object {
+  "data": Object {
+    "login": Any<String>,
+  },
+}
+`;
+
+exports[`Request password recovery 1`] = `
+Object {
+  "data": Object {
+    "requestPasswordRecoveryUrlOverEmail": true,
+  },
+}
+`;
+
+exports[`Request password recovery with nonexistent email 1`] = `
+Object {
+  "data": Object {
+    "requestPasswordRecoveryUrlOverEmail": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "PERSISTED_QUERY_NOT_FOUND",
+      },
+      "locations": Array [
+        Object {
+          "column": 25,
+          "line": 1,
+        },
+      ],
+      "message": "PersistedQueryNotFound",
+      "path": Array [
+        "requestPasswordRecoveryUrlOverEmail",
+      ],
+    },
+  ],
+}
+`;
