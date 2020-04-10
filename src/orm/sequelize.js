@@ -1,5 +1,7 @@
 import 'dotenv/config'
 
+import constants from '../modules/constants'
+
 import Sequelize from 'sequelize'
 
 import { initializeModel } from './model'
@@ -16,11 +18,11 @@ const connectWithOptions = (dbDialect, dbPath, dbPoolMax, dbPoolMin, dbPoolIdle)
 }
 
 export const sequelize = (() => {
-  if (process.env.NODE_ENV === process.env.NODE_PRODUCTION_STRING) {
+  if (process.env.NODE_ENV === constants.NODE_PRODUCTION_STRING) {
     return connectWithUrl(process.env.DATABASE_URL)
   }
 
-  if (process.env.NODE_ENV === process.env.NODE_TEST_STRING) {
+  if (process.env.NODE_ENV === constants.NODE_TEST_STRING) {
     return connectWithOptions(
       process.env.DATABASE_DIALECT,
       process.env.DATABASE_PATH_TEST,

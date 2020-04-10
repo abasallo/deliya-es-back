@@ -1,5 +1,7 @@
 import 'dotenv/config'
 
+import constants from './constants'
+
 import { nodemailerTransporter, sendEmail } from './email'
 
 jest.mock('nodemailer', () => ({ createTransport: _ => _ }))
@@ -15,9 +17,9 @@ test('Nodemailer should be properly configured', async () => {
 test('Sendemail should be called with appropriate email data pieces', async () => {
   nodemailerTransporter.sendMail = _ => Promise.resolve(_)
   const sendEmailResult = await sendEmail('email', 'token')
-  const passwordChangeEmailText = process.env.PASSWORD_CHANGE_EMAIL_TEXT
-  expect(sendEmailResult.from).toBe(process.env.PASSWORD_CHANGE_EMAIL_FROM)
+  const passwordChangeEmailText = constants.PASSWORD_CHANGE_EMAIL_TEXT
+  expect(sendEmailResult.from).toBe(constants.PASSWORD_CHANGE_EMAIL_FROM)
   expect(sendEmailResult.to).toBe('email')
-  expect(sendEmailResult.subject).toBe(process.env.PASSWORD_CHANGE_EMAIL_SUBJECT)
+  expect(sendEmailResult.subject).toBe(constants.PASSWORD_CHANGE_EMAIL_SUBJECT)
   expect(sendEmailResult.text).toBe(passwordChangeEmailText + 'token')
 })

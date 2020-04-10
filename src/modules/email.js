@@ -1,3 +1,5 @@
+import constants from './constants'
+
 import nodemailer from 'nodemailer'
 
 export const nodemailerTransporter = nodemailer.createTransport({
@@ -9,8 +11,8 @@ export const nodemailerTransporter = nodemailer.createTransport({
 
 export const sendEmail = (email, token) =>
   nodemailerTransporter.sendMail({
-    from: process.env.PASSWORD_CHANGE_EMAIL_FROM,
+    from: constants.PASSWORD_CHANGE_EMAIL_FROM,
     to: email,
-    subject: process.env.PASSWORD_CHANGE_EMAIL_SUBJECT,
-    text: process.env.PASSWORD_CHANGE_EMAIL_TEXT + token
+    subject: constants.PASSWORD_CHANGE_EMAIL_SUBJECT,
+    text: constants.PASSWORD_CHANGE_EMAIL_TEXT + token
   })
