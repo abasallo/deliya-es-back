@@ -16,12 +16,12 @@ test('Nodemailer should be properly configured', async () => {
 
 test('Production password recovery URL should be properly composed', () =>
   expect(composePasswordRecoveryUrl('production', 'production', 'token')).toEqual(
-    constants.PASSWORD_CHANGE_EMAIL_TEXT + ` https://${process.env.FRONTEND_URL}/password-change/token`
+    constants.PASSWORD_CHANGE_EMAIL_TEXT + ` https://${process.env.FRONTEND_HOST}/password-change/token`
   ))
 
 test('Non production password recovery URL should be properly composed', () =>
   expect(composePasswordRecoveryUrl('test', 'production', 'token')).toEqual(
-    constants.PASSWORD_CHANGE_EMAIL_TEXT + ` http://${process.env.FRONTEND_URL}:${process.env.FRONTEND_PORT}/password-change/token`
+    constants.PASSWORD_CHANGE_EMAIL_TEXT + ` http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}/password-change/token`
   ))
 
 test('Sendemail should be called with appropriate email data pieces', async () => {

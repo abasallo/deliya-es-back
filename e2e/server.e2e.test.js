@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken'
 let fetch
 let apolloServer
 beforeAll(async done => {
-  fetch = await createApolloFetch({ uri: `http://localhost:${process.env.BACKEND_PORT}/graphql` })
+  fetch = await createApolloFetch({ uri: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/graphql` })
   await model.then(() =>
     server.listen({ port: process.env.BACKEND_PORT }).then(_ => {
       apolloServer = _

@@ -12,9 +12,9 @@ export const nodemailerTransporter = nodemailer.createTransport({
 export const composePasswordRecoveryUrl = (env, productionString, token) => {
   const urlBase = constants.PASSWORD_CHANGE_EMAIL_TEXT
   if (env === productionString) {
-    return urlBase + ` https://${process.env.FRONTEND_URL}/password-change/${token}`
+    return urlBase + ` https://${process.env.FRONTEND_HOST}/password-change/${token}`
   }
-  return urlBase + ` http://${process.env.FRONTEND_URL}:${process.env.FRONTEND_PORT}/password-change/${token}`
+  return urlBase + ` http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}/password-change/${token}`
 }
 
 export const sendEmail = (email, token) =>
