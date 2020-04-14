@@ -51,16 +51,27 @@ Object {
 exports[`Check existing user existence 1`] = `
 Object {
   "data": Object {
-    "doesUserExist": true,
+    "doesUserExists": true,
   },
 }
 `;
 
 exports[`Check non existing user existence 1`] = `
 Object {
-  "data": Object {
-    "doesUserExist": false,
-  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "GRAPHQL_VALIDATION_FAILED",
+      },
+      "locations": Array [
+        Object {
+          "column": 25,
+          "line": 1,
+        },
+      ],
+      "message": "Cannot query field \\"doesUserExist\\" on type \\"Query\\". Did you mean \\"doesUserExists\\"?",
+    },
+  ],
 }
 `;
 
