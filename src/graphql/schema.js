@@ -7,6 +7,7 @@ export default gql`
   }
 
   type Query {
+    doesUserExists(email: String): Boolean
     login(email: String, password: String): String
     requestPasswordRecoveryUrlOverEmail(email: String): Boolean
   }

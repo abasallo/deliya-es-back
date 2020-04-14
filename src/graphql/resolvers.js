@@ -1,7 +1,8 @@
-import { login, passwordRecoveryUrl, addUser, changePassword } from '../services/User'
+import { doesUserExists, login, passwordRecoveryUrl, addUser, changePassword } from '../services/User'
 
 export default {
   Query: {
+    doesUserExists: (parent, { email }, { model }) => doesUserExists(email, model),
     login: (parent, { email, password }, { model }) => login(email, password, model),
     requestPasswordRecoveryUrlOverEmail: (parent, { email }, { model }) => passwordRecoveryUrl(email, model)
   },

@@ -2,7 +2,7 @@ import 'dotenv/config'
 
 import jwt from 'jsonwebtoken' // TODO - Move to utilities in modules/jwt.js
 
-import { login, passwordRecoveryUrl, addUser, changePassword } from './User'
+import { doesUserExists, login, passwordRecoveryUrl, addUser, changePassword } from './User'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
@@ -24,6 +24,10 @@ let model
 beforeEach(async () => ({ sequelize, model } = await initalizeTestDatabase()))
 
 afterEach(async () => await sequelize.closeSequelize())
+
+test('Checks existing user existence', () => expect(doesUserExists(TestUser.email, model)).resolves.toEqual(true))
+
+test('Checks non existing user existence', () => expect(doesUserExists('inexistentUser@host.tld', model)).resolves.toEqual(false))
 
 test('Logs user with correct email and password', async () => {
   const loginOK = await login(TestUser.email, 'password', model)

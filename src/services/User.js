@@ -6,6 +6,11 @@ import { sendEmail } from '../modules/email'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
+export const doesUserExists = async (email, model) => {
+  const user = await (await model).User.findOne({ where: { email: email } })
+  return !!(user && Object.entries(user).length !== 0)
+}
+
 export const login = async (email, password, model) => {
   const user = await (await model).User.findOne({ where: { email: email } })
   if (user) {

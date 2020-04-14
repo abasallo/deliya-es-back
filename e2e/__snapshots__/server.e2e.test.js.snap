@@ -48,6 +48,22 @@ Object {
 }
 `;
 
+exports[`Check existing user existence 1`] = `
+Object {
+  "data": Object {
+    "doesUserExist": true,
+  },
+}
+`;
+
+exports[`Check non existing user existence 1`] = `
+Object {
+  "data": Object {
+    "doesUserExist": false,
+  },
+}
+`;
+
 exports[`Login with user and incorrect password 1`] = `
 Object {
   "data": Object {

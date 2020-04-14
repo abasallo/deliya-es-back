@@ -18,6 +18,24 @@ beforeAll(async done => {
 
 afterAll(async () => await apolloServer.server.close())
 
+test('Check existing user existence', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String) { doesUserExists(email: $email) }',
+      variables: { email: 'user@host.tld' }
+    })
+  ).toMatchSnapshot()
+})
+
+test('Check non existing user existence', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String) { doesUserExist(email: $email) }',
+      variables: { email: 'inexistentUser@host.tld' }
+    })
+  ).toMatchSnapshot()
+})
+
 test('Login with user and password', async () => {
   expect(
     await fetch({
