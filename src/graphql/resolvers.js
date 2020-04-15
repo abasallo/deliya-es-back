@@ -1,4 +1,4 @@
-import { doesUserExists, login, passwordRecoveryUrl, addUser, changePassword } from '../services/User'
+import { doesUserExists, login, passwordRecoveryUrl, addUser, activateUser, changePassword } from '../services/User'
 
 export default {
   Query: {
@@ -8,6 +8,7 @@ export default {
   },
   Mutation: {
     addUser: (parent, { user }, { model }) => addUser(user, model),
+    activateUser: (parent, { token }, { model }) => activateUser(token, model),
     changePasswordWithToken: (parent, { password, token }, { model }) => changePassword(password, token, model)
   }
 }

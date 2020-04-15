@@ -6,7 +6,8 @@ const User = sequelize =>
     surnames: { type: Sequelize.STRING },
     email: { type: Sequelize.STRING },
     password: { type: Sequelize.STRING },
-    isEmailContactAllowed: { type: Sequelize.BOOLEAN }
+    isEmailContactAllowed: { type: Sequelize.BOOLEAN },
+    isActivated: { type: Sequelize.BOOLEAN }
   })
 
 export const initializeModel = sequelize => ({ User: User(sequelize) })

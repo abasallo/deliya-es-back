@@ -2,11 +2,11 @@ import 'dotenv/config'
 
 import jwt from 'jsonwebtoken' // TODO - Move to utilities in modules/jwt.js
 
-import { doesUserExists, login, passwordRecoveryUrl, addUser, changePassword } from './User'
+import { doesUserExists, login, passwordRecoveryUrl, addUser, activateUser, changePassword } from './User'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
-import { TestUser } from '../orm/bootstrap'
+import { TestUser, TestUserDeactivated } from '../orm/bootstrap'
 
 // TODO - Extract to common test utilities
 // TODO - Review database URL - extract- rationalize
@@ -32,6 +32,11 @@ test('Checks non existing user existence', () => expect(doesUserExists('inexiste
 test('Logs user with correct email and password', async () => {
   const loginOK = await login(TestUser.email, 'password', model)
   expect(await jwt.verify(loginOK, process.env.JWT_SECRET)).toBeTruthy()
+})
+
+test('Logs user with correct email and password, but deactivated', async () => {
+  const loginOKDeactivated = login(TestUserDeactivated.email, 'password', model)
+  await expect(loginOKDeactivated).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
 })
 
 test('Logs user with correct email and wrong password', async () => {
@@ -64,6 +69,15 @@ test('Adds user, if not already exists', async () => {
 
   const secondAddUserAttempt = addUser(TestUser, model)
   await expect(secondAddUserAttempt).rejects.toThrow(new ValidationError('Already existing User'))
+})
+
+test('Activates User with token', async () => {
+  const token = await jwt.sign({ email: TestUserDeactivated.email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+  const userActivationResponse = await activateUser(token, model)
+  expect(userActivationResponse).toBeTruthy()
+
+  const loginResponse = await login(TestUserDeactivated.email, 'password', model)
+  expect(await jwt.verify(loginResponse, process.env.JWT_SECRET)).toBeTruthy()
 })
 
 test('Change password with token', async () => {

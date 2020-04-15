@@ -13,7 +13,7 @@ export const doesUserExists = async (email, model) => {
 
 export const login = async (email, password, model) => {
   const user = await (await model).User.findOne({ where: { email: email } })
-  if (user) {
+  if (user && user.dataValues.isActivated) {
     if (await bcrypt.compare(password, user.password)) {
       return jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' })
     }
@@ -39,10 +39,21 @@ export const addUser = async (user, model) => {
       surnames: user.surnames,
       email: user.email,
       password: await bcrypt.hash(user.password, 10),
-      isEmailContactAllowed: user.isEmailContactAllowed
+      isEmailContactAllowed: user.isEmailContactAllowed,
+      isActivated: false
     })
   }
   throw new ValidationError('Already existing User')
+}
+
+export const activateUser = async (token, model) => {
+  try {
+    await jwt.verify(token, process.env.JWT_SECRET)
+    await (await model).User.update({ isActivated: true }, { where: { email: await getUserFromToken(token) } })
+    return true
+  } catch (error) {
+    throw new AuthenticationError('Invalid token')
+  }
 }
 
 export const changePassword = async (password, token, model) => {

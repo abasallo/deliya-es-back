@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Activate User with token 1`] = `
+Object {
+  "data": Object {
+    "activateUser": true,
+  },
+}
+`;
+
+exports[`Activate User with wrong, or expired, token 1`] = `
+Object {
+  "data": Object {
+    "activateUser": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "UNAUTHENTICATED",
+      },
+      "locations": Array [
+        Object {
+          "column": 28,
+          "line": 1,
+        },
+      ],
+      "message": "Invalid token",
+      "path": Array [
+        "activateUser",
+      ],
+    },
+  ],
+}
+`;
+
 exports[`Add user 1`] = `
 Object {
   "data": Object {
@@ -58,20 +91,9 @@ Object {
 
 exports[`Check non existing user existence 1`] = `
 Object {
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "GRAPHQL_VALIDATION_FAILED",
-      },
-      "locations": Array [
-        Object {
-          "column": 25,
-          "line": 1,
-        },
-      ],
-      "message": "Cannot query field \\"doesUserExist\\" on type \\"Query\\". Did you mean \\"doesUserExists\\"?",
-    },
-  ],
+  "data": Object {
+    "doesUserExists": false,
+  },
 }
 `;
 
@@ -105,6 +127,31 @@ Object {
   "data": Object {
     "login": Any<String>,
   },
+}
+`;
+
+exports[`Login with user and password, but deactivated 1`] = `
+Object {
+  "data": Object {
+    "login": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "PERSISTED_QUERY_NOT_FOUND",
+      },
+      "locations": Array [
+        Object {
+          "column": 44,
+          "line": 1,
+        },
+      ],
+      "message": "PersistedQueryNotFound",
+      "path": Array [
+        "login",
+      ],
+    },
+  ],
 }
 `;
 

@@ -14,6 +14,7 @@ export default gql`
 
   type Mutation {
     addUser(user: UserInput!): User
+    activateUser(token: String): Boolean
     changePasswordWithToken(password: String, token: String): Boolean
   }
 
@@ -24,6 +25,7 @@ export default gql`
     email: String!
     password: String!
     isEmailContactAllowed: Boolean!
+    isActivated: Boolean!
   }
 
   input UserInput {

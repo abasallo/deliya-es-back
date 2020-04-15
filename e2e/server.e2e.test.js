@@ -30,7 +30,7 @@ test('Check existing user existence', async () => {
 test('Check non existing user existence', async () => {
   expect(
     await fetch({
-      query: 'query($email: String) { doesUserExist(email: $email) }',
+      query: 'query($email: String) { doesUserExists(email: $email) }',
       variables: { email: 'inexistentUser@host.tld' }
     })
   ).toMatchSnapshot()
@@ -43,6 +43,15 @@ test('Login with user and password', async () => {
       variables: { email: 'user@host.tld', password: 'password' }
     })
   ).toMatchSnapshot({ data: { login: expect.any(String) } })
+})
+
+test('Login with user and password, but deactivated', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String, $password: String) { login(email: $email, password: $password) }',
+      variables: { email: 'userDeactivated@host.tld', password: 'password' }
+    })
+  ).toMatchSnapshot()
 })
 
 test('Login with user and incorrect password', async () => {
@@ -90,8 +99,17 @@ test('Add user', async () => {
   ).toMatchSnapshot({ data: { addUser: { id: expect.any(String), password: expect.any(String) } } })
 })
 
+test('Activate User with token', async () => {
+  const token = await jwt.sign({ email: 'user@host.tld', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+  expect(await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: token }})).toMatchSnapshot()
+})
+
+test('Activate User with wrong, or expired, token', async () => {
+  expect(await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: 'wrong' }})).toMatchSnapshot()
+})
+
 test('Change password with token', async () => {
-  const token = await jwt.sign({ email: 'alvaro@basallo.es', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+  const token = await jwt.sign({ email: 'user@host.tld', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
   expect(
     await fetch({
       query: 'mutation($password: String, $token: String) { changePasswordWithToken(password: $password, token: $token) }',
