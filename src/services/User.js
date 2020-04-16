@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs' // TODO - Move to utilities in modules/?.js, maybe
 import jwt from 'jsonwebtoken' // TODO - Move to utilities in modules/jwt.js
 
 import { getUserFromToken } from '../modules/jwt'
-import { sendEmail } from '../modules/email'
+import { sendPasswordRecoveryEmail, sendActivationRecoveryEmail } from '../modules/email'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
@@ -22,11 +22,21 @@ export const login = async (email, password, model) => {
   throw new PersistedQueryNotFoundError('User not found')
 }
 
-export const passwordRecoveryUrl = async (email, model) => {
+export const requestPasswordRecoveryUrlOverEmail = async (email, model) => {
   const user = await (await model).User.findOne({ where: { email: email } })
-
   if (user) {
-    await sendEmail(email, await jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' }))
+    const token = await jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+    await sendPasswordRecoveryEmail(token, email)
+    return true
+  }
+  throw new PersistedQueryNotFoundError('User not found')
+}
+
+export const requestUserActivationUrlOverEmail = async (email, model) => {
+  const user = await (await model).User.findOne({ where: { email: email } })
+  if (user) {
+    const token = await jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
+    await sendActivationRecoveryEmail(token, email)
     return true
   }
   throw new PersistedQueryNotFoundError('User not found')

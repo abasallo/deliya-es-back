@@ -9,18 +9,40 @@ export const nodemailerTransporter = nodemailer.createTransport({
   auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASSWORD }
 })
 
-export const composePasswordRecoveryUrl = (env, productionString, token) => {
+export const composeTokenUrl = (token, env, productionString, urlText) => {
   const urlBase = constants.PASSWORD_CHANGE_EMAIL_TEXT
   if (env === productionString) {
-    return urlBase + ` https://${process.env.FRONTEND_HOST}/password-change/${token}`
+    return urlBase + ` https://${process.env.FRONTEND_HOST}/${urlText}/${token}`
   }
-  return urlBase + ` http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}/password-change/${token}`
+  return urlBase + ` http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}/${urlText}/${token}`
 }
 
-export const sendEmail = (email, token) =>
+export const composePasswordRecoveryUrl = (token, env, productionString) =>
+  composeTokenUrl(token, env, productionString, constants.PASSWORD_CHANGE_URL)
+
+export const composeUserActivationUrl = (token, env, productionString) =>
+  composeTokenUrl(token, env, productionString, constants.USER_ACTIVATION_URL)
+
+export const sendEmail = (token, email, subject, text) =>
   nodemailerTransporter.sendMail({
-    from: constants.PASSWORD_CHANGE_EMAIL_FROM,
+    from: constants.EMAIL_FROM,
     to: email,
-    subject: constants.PASSWORD_CHANGE_EMAIL_SUBJECT,
-    text: composePasswordRecoveryUrl(process.env.NODE_ENV, constants.NODE_PRODUCTION_STRING, token)
+    subject: subject,
+    text: text
   })
+
+export const sendPasswordRecoveryEmail = (token, email) =>
+  sendEmail(
+    token,
+    email,
+    constants.PASSWORD_CHANGE_EMAIL_SUBJECT,
+    composePasswordRecoveryUrl(token, process.env.NODE_ENV, constants.NODE_PRODUCTION_STRING)
+  )
+
+export const sendActivationRecoveryEmail = (token, email) =>
+  sendEmail(
+    token,
+    email,
+    constants.USER_ACTIVATION_EMAIL_SUBJECT,
+    composeUserActivationUrl(token, process.env.NODE_ENV, constants.NODE_PRODUCTION_STRING)
+  )

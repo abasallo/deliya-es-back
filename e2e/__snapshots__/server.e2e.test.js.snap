@@ -187,3 +187,36 @@ Object {
   ],
 }
 `;
+
+exports[`Request user activation 1`] = `
+Object {
+  "data": Object {
+    "requestUserActivationUrlOverEmail": true,
+  },
+}
+`;
+
+exports[`Request user activation with nonexistent email 1`] = `
+Object {
+  "data": Object {
+    "requestUserActivationUrlOverEmail": null,
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "PERSISTED_QUERY_NOT_FOUND",
+      },
+      "locations": Array [
+        Object {
+          "column": 25,
+          "line": 1,
+        },
+      ],
+      "message": "PersistedQueryNotFound",
+      "path": Array [
+        "requestUserActivationUrlOverEmail",
+      ],
+    },
+  ],
+}
+`;

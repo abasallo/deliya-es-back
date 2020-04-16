@@ -10,6 +10,7 @@ export default gql`
     doesUserExists(email: String): Boolean
     login(email: String, password: String): String
     requestPasswordRecoveryUrlOverEmail(email: String): Boolean
+    requestUserActivationUrlOverEmail(email: String): Boolean
   }
 
   type Mutation {

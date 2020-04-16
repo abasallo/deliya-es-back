@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 
 let fetch
 let apolloServer
+
 beforeAll(async done => {
   fetch = await createApolloFetch({ uri: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/graphql` })
   await model.then(() =>
@@ -81,6 +82,24 @@ test('Request password recovery with nonexistent email', async () => {
   ).toMatchSnapshot()
 })
 
+test('Request user activation', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String) { requestUserActivationUrlOverEmail(email: $email) }',
+      variables: { email: 'user@host.tld' }
+    })
+  ).toMatchSnapshot()
+})
+
+test('Request user activation with nonexistent email', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String) { requestUserActivationUrlOverEmail(email: $email) }',
+      variables: { email: 'inexistentUser@host.tld' }
+    })
+  ).toMatchSnapshot()
+})
+
 test('Add user', async () => {
   expect(
     await fetch({
@@ -101,11 +120,13 @@ test('Add user', async () => {
 
 test('Activate User with token', async () => {
   const token = await jwt.sign({ email: 'user@host.tld', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
-  expect(await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: token }})).toMatchSnapshot()
+  expect(await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: token } })).toMatchSnapshot()
 })
 
 test('Activate User with wrong, or expired, token', async () => {
-  expect(await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: 'wrong' }})).toMatchSnapshot()
+  expect(
+    await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: 'wrong' } })
+  ).toMatchSnapshot()
 })
 
 test('Change password with token', async () => {

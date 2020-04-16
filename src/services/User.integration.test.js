@@ -2,7 +2,15 @@ import 'dotenv/config'
 
 import jwt from 'jsonwebtoken' // TODO - Move to utilities in modules/jwt.js
 
-import { doesUserExists, login, passwordRecoveryUrl, addUser, activateUser, changePassword } from './User'
+import {
+  doesUserExists,
+  login,
+  requestPasswordRecoveryUrlOverEmail,
+  addUser,
+  activateUser,
+  changePassword,
+  requestUserActivationUrlOverEmail
+} from './User'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
@@ -51,13 +59,25 @@ test('Logs user with non existent email', async () => {
 
 test('Request password recovery', async () => {
   // TODO - Mock sendEmail to avoid email to actually be sent to a fake email
-  const passwordRecoveryRequestOK = await passwordRecoveryUrl(TestUser.email, model)
+  const passwordRecoveryRequestOK = await requestPasswordRecoveryUrlOverEmail(TestUser.email, model)
   expect(passwordRecoveryRequestOK).toBeTruthy()
 })
 
 test('Request password recovery with non existing email', async () => {
   // TODO - Mock sendEmail to avoid email to actually be sent to a fake email
-  const passwordRecoveryRequestKO = passwordRecoveryUrl('inexistentUser@host.tld', model)
+  const passwordRecoveryRequestKO = requestPasswordRecoveryUrlOverEmail('inexistentUser@host.tld', model)
+  await expect(passwordRecoveryRequestKO).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
+})
+
+test('Request user activation', async () => {
+  // TODO - Mock sendEmail to avoid email to actually be sent to a fake email
+  const passwordRecoveryRequestOK = await requestUserActivationUrlOverEmail(TestUser.email, model)
+  expect(passwordRecoveryRequestOK).toBeTruthy()
+})
+
+test('Request user activation with non existing email', async () => {
+  // TODO - Mock sendEmail to avoid email to actually be sent to a fake email
+  const passwordRecoveryRequestKO = requestUserActivationUrlOverEmail('inexistentUser@host.tld', model)
   await expect(passwordRecoveryRequestKO).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
 })
 
