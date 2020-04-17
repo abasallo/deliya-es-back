@@ -4,7 +4,7 @@ model
   .then(() => {
     console.log('Database initialized')
     server
-      .listen({ port: process.env.BACKEND_PORT })
+      .listen({ port: process.env.PORT })
       .then(({ port }) => console.log(`Server ready at ${port}`))
       .catch(error => console.error(`Server startup error: ${error}`))
   })
