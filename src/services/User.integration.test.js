@@ -2,34 +2,26 @@ import 'dotenv/config'
 
 import jwt from 'jsonwebtoken' // TODO - Move to utilities in modules/jwt.js
 
-import {
-  doesUserExists,
-  login,
-  requestPasswordRecoveryUrlOverEmail,
-  addUser,
-  activateUser,
-  changePassword,
-  requestUserActivationUrlOverEmail
-} from './User'
+import { initializeTestDatabase } from '../modules/testDatabase'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
 import { TestUser, TestUserDeactivated } from '../orm/bootstrap'
 
-// TODO - Extract to common test utilities
-// TODO - Review database URL - extract- rationalize
-const initalizeTestDatabase = async () => {
-  jest.resetModules()
-  const sequelize = require('../orm/sequelize')
-  const model = await sequelize.initSequelize()
-  await model.User.create(TestUser)
-  return { sequelize, model }
-}
+import {
+  activateUser,
+  addUser,
+  changePassword,
+  doesUserExists,
+  login,
+  requestPasswordRecoveryUrlOverEmail,
+  requestUserActivationUrlOverEmail
+} from './User'
 
 let sequelize
 let model
 
-beforeEach(async () => ({ sequelize, model } = await initalizeTestDatabase()))
+beforeEach(async () => ({ sequelize, model } = await initializeTestDatabase('test')))
 
 afterEach(async () => await sequelize.closeSequelize())
 
@@ -82,13 +74,7 @@ test('Request user activation with non existing email', async () => {
 })
 
 test('Adds user, if not already exists', async () => {
-  await model.User.destroy({ where: {}, truncate: true })
-
-  const firstAddUserAttempt = await addUser(TestUser, model)
-  expect(firstAddUserAttempt.email).toBe(TestUser.email)
-
-  const secondAddUserAttempt = addUser(TestUser, model)
-  await expect(secondAddUserAttempt).rejects.toThrow(new ValidationError('Already existing User'))
+  await expect(addUser(TestUser, model)).rejects.toThrow(new ValidationError('Already existing User'))
 })
 
 test('Activates User with token', async () => {

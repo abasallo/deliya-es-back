@@ -1,21 +1,13 @@
 import 'dotenv/config'
 
+import { initializeTestDatabase } from '../modules/testDatabase'
+
 import { TestUser } from './bootstrap'
 
-// TODO - Extract to common test utilities
-const initalizeDatabase = async environment => {
-  process.env.NODE_ENV = environment
-  process.env.DATABASE_URL = 'sqlite://deliya-production.test.sqlite'
-  jest.resetModules()
-  const sequelize = require('./sequelize')
-  const model = await sequelize.initSequelize()
-  return { sequelize, model }
-}
-
 test('Production database must be properly initialized', async () => {
-  const { sequelize, model } = await initalizeDatabase('production')
+  const { sequelize, model } = initializeTestDatabase('production')
 
-  const userCount = await model.User.findAndCountAll()
+  const userCount = await (await model).User.findAndCountAll()
 
   expect(userCount.count).toEqual(0)
 
@@ -23,9 +15,9 @@ test('Production database must be properly initialized', async () => {
 })
 
 test('Test database must be properly initialized', async () => {
-  const { sequelize, model } = await initalizeDatabase('test')
+  const { sequelize, model } = await initializeTestDatabase('test')
 
-  const user = await model.User.findOne({ where: { email: 'user@host.tld' } })
+  const user = await (await model).User.findOne({ where: { email: 'user@host.tld' } })
 
   expect(user.names).toBe(TestUser.names)
   expect(user.surnames).toBe(TestUser.surnames)
@@ -36,9 +28,9 @@ test('Test database must be properly initialized', async () => {
 })
 
 test('Dev database must be properly initialized', async () => {
-  const { sequelize, model } = await initalizeDatabase('dev')
+  const { sequelize, model } = await initializeTestDatabase('dev')
 
-  const user = await model.User.findOne({ where: { email: 'user@host.tld' } })
+  const user = await (await model).User.findOne({ where: { email: 'user@host.tld' } })
 
   expect(user.names).toBe(TestUser.names)
   expect(user.surnames).toBe(TestUser.surnames)
