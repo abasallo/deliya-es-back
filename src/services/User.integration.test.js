@@ -2,7 +2,7 @@ import 'dotenv/config'
 
 import { initializeTestDatabase } from '../modules/testDatabase'
 
-import { isTokenValid, generateTokenFromEmailAndTTL } from '../modules/jwt'
+import { isTokenValid, generateTokenFromEmailAndTTL } from '../modules/crypto'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 

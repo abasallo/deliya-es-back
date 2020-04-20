@@ -1,6 +1,4 @@
-import bcrypt from 'bcryptjs' // TODO - Move to utilities in modules/?.js, maybe merge with jwt.js
-
-import { getUserFromToken, generateTokenFromEmailAndTTL, isTokenValid } from '../modules/jwt'
+import { getUserFromToken, generateTokenFromEmailAndTTL, isTokenValid, isPasswordValid, hashPassword } from '../modules/crypto'
 import { sendPasswordRecoveryEmail, sendActivationRecoveryEmail } from '../modules/email'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
@@ -13,7 +11,7 @@ export const doesUserExists = async (email, model) => {
 export const login = async (email, password, model) => {
   const user = await (await model).User.findOne({ where: { email: email } })
   if (user && user.dataValues.isActivated) {
-    if (await bcrypt.compare(password, user.password)) return generateTokenFromEmailAndTTL(user.email, '30d')
+    if (await isPasswordValid(password, user.password)) return generateTokenFromEmailAndTTL(user.email, '30d')
     throw new AuthenticationError('Invalid password')
   }
   throw new PersistedQueryNotFoundError('User not found')
@@ -43,7 +41,7 @@ export const addUser = async (user, model) => {
       names: user.names,
       surnames: user.surnames,
       email: user.email,
-      password: await bcrypt.hash(user.password, 10),
+      password: await hashPassword(user.password, 10),
       isEmailContactAllowed: user.isEmailContactAllowed,
       isActivated: false
     })
@@ -62,7 +60,7 @@ export const activateUser = async (token, model) => {
 
 export const changePassword = async (password, token, model) => {
   if (await isTokenValid(token)) {
-    await (await model).User.update({ password: await bcrypt.hash(password, 10) }, { where: { email: await getUserFromToken(token) } })
+    await (await model).User.update({ password: await hashPassword(password, 10) }, { where: { email: await getUserFromToken(token) } })
     return true
   } else {
     throw new AuthenticationError('Invalid token')

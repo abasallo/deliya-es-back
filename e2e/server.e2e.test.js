@@ -2,7 +2,7 @@ import { model, server } from '../src/server-helper'
 
 import { createApolloFetch } from 'apollo-fetch'
 
-import { generateTokenFromEmailAndTTL } from '../src/modules/jwt'
+import { generateTokenFromEmailAndTTL } from '../src/modules/crypto'
 
 let fetch
 let apolloServer
