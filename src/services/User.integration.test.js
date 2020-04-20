@@ -1,22 +1,22 @@
 import 'dotenv/config'
 
-import jwt from 'jsonwebtoken' // TODO - Move to utilities in modules/jwt.js
-
 import { initializeTestDatabase } from '../modules/testDatabase'
+
+import { isTokenValid, generateTokenFromEmailAndTTL } from '../modules/jwt'
 
 import { AuthenticationError, PersistedQueryNotFoundError, ValidationError } from 'apollo-server-errors'
 
-import { TestUser, TestUserDeactivated } from '../orm/bootstrap'
-
 import {
-  activateUser,
   addUser,
   changePassword,
   doesUserExists,
   login,
   requestPasswordRecoveryUrlOverEmail,
-  requestUserActivationUrlOverEmail
+  requestUserActivationUrlOverEmail,
+  activateUser
 } from './User'
+
+import { TestUser, TestUserDeactivated } from '../orm/bootstrap'
 
 let sequelize
 let model
@@ -29,10 +29,8 @@ test('Checks existing user existence', () => expect(doesUserExists(TestUser.emai
 
 test('Checks non existing user existence', () => expect(doesUserExists('inexistentUser@host.tld', model)).resolves.toEqual(false))
 
-test('Logs user with correct email and password', async () => {
-  const loginOK = await login(TestUser.email, 'password', model)
-  expect(await jwt.verify(loginOK, process.env.JWT_SECRET)).toBeTruthy()
-})
+test('Logs user with correct email and password', async () =>
+  expect(await isTokenValid(await login(TestUser.email, 'password', model))).toBeTruthy())
 
 test('Logs user with correct email and password, but deactivated', async () => {
   const loginOKDeactivated = login(TestUserDeactivated.email, 'password', model)
@@ -78,19 +76,11 @@ test('Adds user, if not already exists', async () => {
 })
 
 test('Activates User with token', async () => {
-  const token = await jwt.sign({ email: TestUserDeactivated.email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
-  const userActivationResponse = await activateUser(token, model)
-  expect(userActivationResponse).toBeTruthy()
-
-  const loginResponse = await login(TestUserDeactivated.email, 'password', model)
-  expect(await jwt.verify(loginResponse, process.env.JWT_SECRET)).toBeTruthy()
+  expect(await activateUser(await generateTokenFromEmailAndTTL(TestUserDeactivated.email), model)).toBeTruthy()
+  expect(await isTokenValid(await login(TestUserDeactivated.email, 'password', model))).toBeTruthy()
 })
 
 test('Change password with token', async () => {
-  const token = await jwt.sign({ email: TestUser.email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
-  const passwordChangedResponse = await changePassword('changedPassword', token, model)
-  expect(passwordChangedResponse).toBeTruthy()
-
-  const loginResponse = await login(TestUser.email, 'changedPassword', model)
-  expect(await jwt.verify(loginResponse, process.env.JWT_SECRET)).toBeTruthy()
+  expect(await changePassword('changedPassword', await generateTokenFromEmailAndTTL(TestUser.email), model)).toBeTruthy()
+  expect(await isTokenValid(await login(TestUser.email, 'changedPassword', model))).toBeTruthy()
 })

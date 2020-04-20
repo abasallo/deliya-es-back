@@ -2,7 +2,7 @@ import 'dotenv/config'
 
 import jwt from 'jsonwebtoken'
 
-import { getUserFromToken, getTokenFromRequest, getAuthenticatedUserFromRequest } from './jwt'
+import { getUserFromToken, getTokenFromRequest, getAuthenticatedUserFromRequest, generateTokenFromEmailAndTTL, isTokenValid } from './jwt'
 
 const properToken = jwt.sign({ email: 'email', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
 
@@ -24,3 +24,7 @@ test('Extracts token from request', () => {
 test('Extracts authenticated user from request', async () => {
   expect(getAuthenticatedUserFromRequest({ headers: { authorization: 'Bearer ' + (await properToken) } })).resolves.toBe('email')
 })
+
+test('Generates token with default TTL properly', async () => expect(await generateTokenFromEmailAndTTL('user@host.tld')).toBeDefined())
+
+test('Checks token validity', async () => expect(await isTokenValid(await generateTokenFromEmailAndTTL('user@host.tld'))).toBeTruthy())

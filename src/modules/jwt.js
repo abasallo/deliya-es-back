@@ -18,3 +18,8 @@ export const getTokenFromRequest = request => {
 }
 
 export const getAuthenticatedUserFromRequest = request => getUserFromToken(getTokenFromRequest(request))
+
+export const generateTokenFromEmailAndTTL = (email, ttl) =>
+  jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: ttl || '10m' })
+
+export const isTokenValid = token => jwt.verify(token, process.env.JWT_SECRET)

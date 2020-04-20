@@ -2,7 +2,7 @@ import { model, server } from '../src/server-helper'
 
 import { createApolloFetch } from 'apollo-fetch'
 
-import jwt from 'jsonwebtoken'
+import { generateTokenFromEmailAndTTL } from '../src/modules/jwt'
 
 let fetch
 let apolloServer
@@ -119,8 +119,12 @@ test('Add user', async () => {
 })
 
 test('Activate User with token', async () => {
-  const token = await jwt.sign({ email: 'user@host.tld', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
-  expect(await fetch({ query: 'mutation($token: String) { activateUser(token: $token) }', variables: { token: token } })).toMatchSnapshot()
+  expect(
+    await fetch({
+      query: 'mutation($token: String) { activateUser(token: $token) }',
+      variables: { token: await generateTokenFromEmailAndTTL('user@host.tld') }
+    })
+  ).toMatchSnapshot()
 })
 
 test('Activate User with wrong, or expired, token', async () => {
@@ -130,11 +134,10 @@ test('Activate User with wrong, or expired, token', async () => {
 })
 
 test('Change password with token', async () => {
-  const token = await jwt.sign({ email: 'user@host.tld', date: Date.now() }, process.env.JWT_SECRET, { expiresIn: '10m' })
   expect(
     await fetch({
       query: 'mutation($password: String, $token: String) { changePasswordWithToken(password: $password, token: $token) }',
-      variables: { password: 'newPassword', token: token }
+      variables: { password: 'newPassword', token: await generateTokenFromEmailAndTTL('user@host.tld') }
     })
   ).toMatchSnapshot()
 })
