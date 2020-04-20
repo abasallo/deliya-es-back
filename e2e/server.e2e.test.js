@@ -1,23 +1,20 @@
-import { model, server } from '../src/server-helper'
+import { database, model, server } from '../src/server-helper'
 
 import { createApolloFetch } from 'apollo-fetch'
 
 import { generateTokenFromEmailAndTTL } from '../src/modules/crypto'
 
 let fetch
-let apolloServer
-
-beforeAll(async done => {
+beforeAll(async () => {
+  await model
   fetch = await createApolloFetch({ uri: `http://${process.env.HOST}:${process.env.PORT}/graphql` })
-  await model.then(() =>
-    server.listen({ port: process.env.PORT }).then(_ => {
-      apolloServer = _
-      done()
-    })
-  )
+  await server.listen({ port: process.env.PORT })
 })
 
-afterAll(async () => await apolloServer.server.close())
+afterAll(async () => {
+  await (await database).close()
+  await server.stop()
+})
 
 test('Check existing user existence', async () => {
   expect(

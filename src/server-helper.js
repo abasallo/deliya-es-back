@@ -1,12 +1,14 @@
 import 'dotenv/config'
 
-import { initSequelize } from './orm/sequelize'
+import { sequelize, initSequelize } from './orm/sequelize'
 
 import { ApolloServer } from 'apollo-server'
 
 import typeDefs from './graphql/schema'
 
 import resolvers from './graphql/resolvers'
+
+export const database = sequelize
 
 export const model = initSequelize()
 

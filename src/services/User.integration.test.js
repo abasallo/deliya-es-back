@@ -25,9 +25,9 @@ beforeEach(async () => ({ sequelize, model } = await initializeTestDatabase('tes
 
 afterEach(async () => await sequelize.closeSequelize())
 
-test('Checks existing user existence', () => expect(doesUserExists(TestUser.email, model)).resolves.toEqual(true))
+test('Checks existing user existence', () => expect(doesUserExists(TestUser.email, model)).resolves.toBeTruthy())
 
-test('Checks non existing user existence', () => expect(doesUserExists('inexistentUser@host.tld', model)).resolves.toEqual(false))
+test('Checks non existing user existence', () => expect(doesUserExists('inexistentUser@host.tld', model)).resolves.toBeFalsy())
 
 test('Logs user with correct email and password', async () =>
   expect(await isTokenValid(await login(TestUser.email, 'password', model))).toBeTruthy())
