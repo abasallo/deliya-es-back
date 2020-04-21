@@ -2,10 +2,11 @@ import jwt from 'jsonwebtoken'
 
 import bcrypt from 'bcryptjs'
 
+import constants from './constants'
+
 export const getUserFromToken = async token => {
   try {
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET)
-    return decoded.email
+    return (await jwt.verify(token, process.env.JWT_SECRET)).email
   } catch (error) {
     return undefined
   }
@@ -22,10 +23,10 @@ export const getTokenFromRequest = request => {
 export const getAuthenticatedUserFromRequest = request => getUserFromToken(getTokenFromRequest(request))
 
 export const generateTokenFromEmailAndTTL = (email, ttl) =>
-  jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: ttl || '10m' })
+  jwt.sign({ email: email, date: Date.now() }, process.env.JWT_SECRET, { expiresIn: ttl || constants.TOKEN_SHORT_TTL })
 
 export const isTokenValid = token => jwt.verify(token, process.env.JWT_SECRET)
 
 export const isPasswordValid = (plainPassword, hashedPassword) => bcrypt.compare(plainPassword, hashedPassword)
 
-export const hashPassword = password => bcrypt.hash(password, 10)
+export const hashPassword = password => bcrypt.hash(password, constants.PASSWORD_HASH_SALT_ROUNDS)

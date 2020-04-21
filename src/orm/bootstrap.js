@@ -1,4 +1,4 @@
-const NODE_ENV_PRODUCTION_STRING = 'production'
+import constants from '../modules/constants'
 
 export const TestUser = {
   names: 'name',
@@ -19,7 +19,7 @@ export const TestUserDeactivated = {
 }
 
 export const initializeData = (model, env) => {
-  if (env !== NODE_ENV_PRODUCTION_STRING) {
+  if (env !== constants.NODE_PRODUCTION_STRING) {
     model.User.create(TestUser)
     model.User.create(TestUserDeactivated)
   }

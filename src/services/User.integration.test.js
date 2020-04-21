@@ -16,12 +16,14 @@ import {
   activateUser
 } from './User'
 
+import constants from '../modules/constants'
+
 import { TestUser, TestUserDeactivated } from '../orm/bootstrap'
 
 let sequelize
 let model
 
-beforeEach(async () => ({ sequelize, model } = await initializeTestDatabase('test')))
+beforeEach(async () => ({ sequelize, model } = await initializeTestDatabase(constants.NODE_DEVELOPMENT_STRING)))
 
 afterEach(async () => await sequelize.closeSequelize())
 
@@ -34,17 +36,17 @@ test('Logs user with correct email and password', async () =>
 
 test('Logs user with correct email and password, but deactivated', async () => {
   const loginOKDeactivated = login(TestUserDeactivated.email, 'password', model)
-  await expect(loginOKDeactivated).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
+  await expect(loginOKDeactivated).rejects.toThrow(new PersistedQueryNotFoundError(constants.USER_ERROR_NOT_FOUND))
 })
 
 test('Logs user with correct email and wrong password', async () => {
   const loginKOPassword = login(TestUser.email, 'wrongPassword', model)
-  await expect(loginKOPassword).rejects.toThrow(new AuthenticationError('Invalid password'))
+  await expect(loginKOPassword).rejects.toThrow(new AuthenticationError(constants.USER_ERROR_PASSWORD))
 })
 
 test('Logs user with non existent email', async () => {
   const loginKOEmail = login('inexistentUser@host.tld', 'password', model)
-  await expect(loginKOEmail).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
+  await expect(loginKOEmail).rejects.toThrow(new PersistedQueryNotFoundError(constants.USER_ERROR_NOT_FOUND))
 })
 
 test('Request password recovery', async () => {
@@ -54,7 +56,7 @@ test('Request password recovery', async () => {
 
 test('Request password recovery with non existing email', async () => {
   const passwordRecoveryRequestKO = requestPasswordRecoveryUrlOverEmail('inexistentUser@host.tld', model)
-  await expect(passwordRecoveryRequestKO).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
+  await expect(passwordRecoveryRequestKO).rejects.toThrow(new PersistedQueryNotFoundError(constants.USER_ERROR_NOT_FOUND))
 })
 
 test('Request user activation', async () => {
@@ -64,11 +66,11 @@ test('Request user activation', async () => {
 
 test('Request user activation with non existing email', async () => {
   const passwordRecoveryRequestKO = requestUserActivationUrlOverEmail('inexistentUser@host.tld', model)
-  await expect(passwordRecoveryRequestKO).rejects.toThrow(new PersistedQueryNotFoundError('User not found'))
+  await expect(passwordRecoveryRequestKO).rejects.toThrow(new PersistedQueryNotFoundError(constants.USER_ERROR_NOT_FOUND))
 })
 
 test('Adds user, if not already exists', async () => {
-  await expect(addUser(TestUser, model)).rejects.toThrow(new ValidationError('Already existing User'))
+  await expect(addUser(TestUser, model)).rejects.toThrow(new ValidationError(constants.USER_ERROR_MESSAGE_ALREADY_USED))
 })
 
 test('Activates User with token', async () => {
