@@ -44,7 +44,7 @@ export const sequelize = (() => {
 
 export const initSequelize = async () => {
   const model = await initializeModel(await sequelize)
-  await sequelize.sync({ force: true })
+  await sequelize.sync({ force: !(process.env.NODE_ENV === constants.NODE_PRODUCTION_STRING) })
   await initializeData(model, process.env.NODE_ENV)
   return model
 }
