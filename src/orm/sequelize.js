@@ -7,13 +7,14 @@ import Sequelize from 'sequelize'
 import { initializeModel } from './model'
 import { initializeData } from './bootstrap'
 
-const connectWithUrl = url => new Sequelize(url)
+const connectWithUrl = url => new Sequelize(url, { logging: false })
 
 const connectWithOptions = (dbDialect, dbPath, dbPoolMax, dbPoolMin, dbPoolIdle) => {
   return new Sequelize({
     dialect: dbDialect,
     storage: dbPath,
-    pool: { max: parseInt(dbPoolMax), min: parseInt(dbPoolMin), idle: parseInt(dbPoolIdle) }
+    pool: { max: parseInt(dbPoolMax), min: parseInt(dbPoolMin), idle: parseInt(dbPoolIdle) },
+    logging: false
   })
 }
 
