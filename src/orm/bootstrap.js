@@ -5,7 +5,8 @@ export const TestUser = {
   surnames: 'surnames',
   email: 'user@host.tld',
   password: '$2y$12$NeJhI/.IIUpkKzBAatDLKe8gEMPL..kSsEujozUE.jJ4n0f4YR6i2', // password: password
-  isEmailContactAllowed: true,
+  isContactAllowed: true,
+  isCook: false,
   isActivated: true
 }
 
@@ -14,7 +15,8 @@ export const TestUserDeactivated = {
   surnames: 'surnames',
   email: 'userDeactivated@host.tld',
   password: '$2y$12$NeJhI/.IIUpkKzBAatDLKe8gEMPL..kSsEujozUE.jJ4n0f4YR6i2', // password: password
-  isEmailContactAllowed: true,
+  isContactAllowed: true,
+  isCook: false,
   isActivated: false
 }
 

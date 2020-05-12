@@ -34,6 +34,24 @@ test('Check non existing user existence', async () => {
   ).toMatchSnapshot()
 })
 
+test('Check if user is a cook, with valid token', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String, $token: String) { isACook(email: $email, token: $token) }',
+      variables: { email: 'user@host.tld', token: await generateTokenFromEmailAndTTL('user@host.tld') }
+    })
+  ).toMatchSnapshot()
+})
+
+test('Check if user is a cook, with invalid, or expired, token', async () => {
+  expect(
+    await fetch({
+      query: 'query($email: String, $token: String) { isACook(email: $email, token: $token) }',
+      variables: { email: 'user@host.tld', token: 'wrong' }
+    })
+  ).toMatchSnapshot()
+})
+
 test('Login with user and password', async () => {
   expect(
     await fetch({
@@ -100,17 +118,18 @@ test('Request user activation with nonexistent email', async () => {
 test('Add user', async () => {
   expect(
     await fetch({
-      query: `mutation($names: String, $surnames: String, $email: String!, $password: String!, $isEmailContactAllowed: Boolean!) {
-                addUser(user: { names: $names, surnames: $surnames, email: $email, password: $password, isEmailContactAllowed: $isEmailContactAllowed }) {
+      query: `mutation($names: String, $surnames: String, $email: String!, $password: String!, $isContactAllowed: Boolean!, $isCook: Boolean!) {
+                addUser(user: { names: $names, surnames: $surnames, email: $email, password: $password, isContactAllowed: $isContactAllowed, isCook: $isCook }) {
                   id
                   names
                   surnames
                   email
                   password
-                  isEmailContactAllowed
+                  isContactAllowed
+                  isCook
                 }
       }`,
-      variables: { names: 'names', surnames: 'surnames', email: 'email', password: 'password', isEmailContactAllowed: true }
+      variables: { names: 'names', surnames: 'surnames', email: 'email', password: 'password', isContactAllowed: true, isCook: true }
     })
   ).toMatchSnapshot({ data: { addUser: { id: expect.any(String), password: expect.any(String) } } })
 })

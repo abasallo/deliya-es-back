@@ -7,7 +7,8 @@ export default gql`
   }
 
   type Query {
-    doesUserExists(email: String): Boolean
+    doesUserExists(email: String, token: String): Boolean
+    isACook(email: String, token: String): Boolean
     login(email: String, password: String): String
     requestPasswordRecoveryUrlOverEmail(email: String): Boolean
     requestUserActivationUrlOverEmail(email: String): Boolean
@@ -25,7 +26,8 @@ export default gql`
     surnames: String
     email: String!
     password: String!
-    isEmailContactAllowed: Boolean!
+    isContactAllowed: Boolean!
+    isCook: Boolean!
     isActivated: Boolean!
   }
 
@@ -34,6 +36,7 @@ export default gql`
     surnames: String
     email: String!
     password: String!
-    isEmailContactAllowed: Boolean!
+    isContactAllowed: Boolean!
+    isCook: Boolean!
   }
 `

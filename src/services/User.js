@@ -10,6 +10,18 @@ export const doesUserExists = async (email, model) => {
   return !!(user && Object.entries(user).length !== 0)
 }
 
+export const isACook = async (email, token, model) => {
+  try {
+    if (await isTokenValid(token)) {
+      return (await (await model).User.findOne({ where: { email: email } })).dataValues.isCook
+    } else {
+      throw new AuthenticationError(constants.USER_ERROR_MESSAGE_INVALID_TOKEN)
+    }
+  } catch (e) {
+    throw new AuthenticationError(constants.USER_ERROR_MESSAGE_INVALID_TOKEN)
+  }
+}
+
 export const login = async (email, password, model) => {
   const user = await (await model).User.findOne({ where: { email: email } })
   if (user && user.dataValues.isActivated) {
@@ -44,7 +56,8 @@ export const addUser = async (user, model) => {
       surnames: user.surnames,
       email: user.email,
       password: await hashPassword(user.password, constants.PASSWORD_HASH_SALT_ROUNDS),
-      isEmailContactAllowed: user.isEmailContactAllowed,
+      isContactAllowed: user.isContactAllowed,
+      isCook: user.isCook,
       isActivated: false
     })
   }
@@ -52,19 +65,30 @@ export const addUser = async (user, model) => {
 }
 
 export const activateUser = async (token, model) => {
-  if (await isTokenValid(token)) {
-    await (await model).User.update({ isActivated: true }, { where: { email: await getUserFromToken(token) } })
-    return true
-  } else {
+  try {
+    if (await isTokenValid(token)) {
+      await (await model).User.update({ isActivated: true }, { where: { email: await getUserFromToken(token) } })
+      return true
+    } else {
+      throw new AuthenticationError(constants.USER_ERROR_MESSAGE_INVALID_TOKEN)
+    }
+  } catch (e) {
     throw new AuthenticationError(constants.USER_ERROR_MESSAGE_INVALID_TOKEN)
   }
 }
 
 export const changePassword = async (password, token, model) => {
-  if (await isTokenValid(token)) {
-    await (await model).User.update({ password: await hashPassword(password, constants.PASSWORD_HASH_SALT_ROUNDS) }, { where: { email: await getUserFromToken(token) } })
-    return true
-  } else {
+  try {
+    if (await isTokenValid(token)) {
+      await (await model).User.update(
+        { password: await hashPassword(password, constants.PASSWORD_HASH_SALT_ROUNDS) },
+        { where: { email: await getUserFromToken(token) } }
+      )
+      return true
+    } else {
+      throw new AuthenticationError(constants.USER_ERROR_MESSAGE_INVALID_TOKEN)
+    }
+  } catch (e) {
     throw new AuthenticationError(constants.USER_ERROR_MESSAGE_INVALID_TOKEN)
   }
 }

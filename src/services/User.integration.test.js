@@ -10,6 +10,7 @@ import {
   addUser,
   changePassword,
   doesUserExists,
+  isACook,
   login,
   requestPasswordRecoveryUrlOverEmail,
   requestUserActivationUrlOverEmail,
@@ -30,6 +31,9 @@ afterEach(async () => await sequelize.closeSequelize())
 test('Checks existing user existence', () => expect(doesUserExists(TestUser.email, model)).resolves.toBeTruthy())
 
 test('Checks non existing user existence', () => expect(doesUserExists('inexistentUser@host.tld', model)).resolves.toBeFalsy())
+
+test('Checks if user is a cook', async () =>
+  expect(await isACook(TestUser.email, await generateTokenFromEmailAndTTL(TestUser.email), model)).toBeFalsy())
 
 test('Logs user with correct email and password', async () =>
   expect(await isTokenValid(await login(TestUser.email, 'password', model))).toBeTruthy())
