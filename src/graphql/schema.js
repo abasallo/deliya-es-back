@@ -7,7 +7,7 @@ export default gql`
   }
 
   type Query {
-    doesUserExists(email: String, token: String): Boolean
+    doesUserExists(email: String): Boolean
     isACook(email: String, token: String): Boolean
     login(email: String, password: String): String
     requestPasswordRecoveryUrlOverEmail(email: String): Boolean
